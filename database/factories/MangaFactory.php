@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Categoria;
+use App\Models\Subcategoria;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,7 @@ class MangaFactory extends Factory
             'titulo' => fake()->unique()->sentence(),
             'portada' => fake()->imageUrl(),
             'categoria_id' => Categoria::all()->random()->id,
+            'subcategoria_id' => Subcategoria::all()->random()->id,
         ];
     }
 }

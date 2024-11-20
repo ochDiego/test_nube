@@ -16,6 +16,7 @@ class Manga extends Model
         'titulo',
         'portada',
         'categoria_id',
+        'subcategoria_id',
     ];
 
     public function categoria(): BelongsTo
@@ -23,8 +24,8 @@ class Manga extends Model
         return $this->belongsTo(Categoria::class);
     }
 
-    public function subcategorias(): HasManyThrough
+    public function subcategoria(): BelongsTo
     {
-        return $this->hasManyThrough(Subcategoria::class, Categoria::class);
+        return $this->belongsTo(Subcategoria::class);
     }
 }

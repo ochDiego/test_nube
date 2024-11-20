@@ -20,7 +20,7 @@ class MangaController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $mangas = Manga::latest()->get();
+            $mangas = Manga::orderByDesc('id')->paginate();
 
             // Respuesta
             return response()->json([
@@ -49,16 +49,13 @@ class MangaController extends Controller
                 'titulo' => 'required|string|max:255|unique:mangas',
                 'portada' => 'required|image|mimes:jpg,jpeg,png|max:2048',
                 'categoria_id' => 'required|exists:categorias,id',
+                'subcategoria_id' => 'required|exists:subcategorias,id',
             ]);
 
             // Almacena la imagen de portada
             $path = $request->file('portada')->store('images', 'public');
 
-            $manga = Manga::create([
-                'titulo' => $request->titulo,
-                'portada' => $path,
-                'categoria_id' => $request->categoria_id,
-            ]);
+            $manga = Manga::create($request->all());
 
             // Respuesta
             return response()->json([
@@ -80,7 +77,26 @@ class MangaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id) {}
+    public function show($id)
+    {
+        try {
+            $manga = Manga::findOrFail($id);
+
+            // Respuesta
+            return response()->json([
+                'message' => 'Manga obtenido',
+                'error' => false,
+                'data' => MangaResource::collection($manga),
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+
+            // Respuesta en caso de que no exista el manga
+            return response()->json([
+                'message' => 'Manga no encontrado',
+                'error' => true,
+            ], 404);
+        }
+    }
 
     /**
      * Update the specified resource in storage.
@@ -94,6 +110,7 @@ class MangaController extends Controller
                 'titulo' => 'sometimes|required|string|max:255|unique:mangas,titulo,' . $manga->id,
                 'portada' => 'sometimes|required|image|mimes:jpg,jpeg,png|max:2048',
                 'categoria_id' => 'sometimes|required|exists:categorias,id',
+                'subcategoria_id' => 'sometimes|required|exists:subcategorias,id',
             ]);
 
             // Si se sube una nueva imagen de portada, elimina la anterior
@@ -104,11 +121,7 @@ class MangaController extends Controller
             }
 
             // Actualiza los campos
-            $manga->update([
-                'titulo' => $request->titulo,
-                'portada' => $request->portada,
-                'categoria_id' => $request->categoria_id,
-            ]);
+            $manga->update($request->all());
 
             // Respuesta
             return response()->json([

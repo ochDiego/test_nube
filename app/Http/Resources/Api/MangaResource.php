@@ -19,7 +19,9 @@ class MangaResource extends JsonResource
             'titulo' => $this->titulo,
             'portada' => $this->portada,
             'categoria' => $this->categoria->nombre,
-            'subcategorias' => $this->categoria->subcategorias,
+            'subcategoria' => $this->subcategoria->nombre,
+            'created_at' => $this->created_at->format('d-m-Y'),
+            'updated_at' => $this->updated_at->format('d-m-Y'),
         ];
     }
 }
